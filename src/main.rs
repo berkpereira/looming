@@ -48,7 +48,7 @@ fn handle_display(name: String) -> anyhow::Result<()> {
     let items = storage::load()?;
     for item in items {
         if item.name() == name {
-            item.display();
+            item.display_with_bullet(false);
             return Ok(());
         }
     }

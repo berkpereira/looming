@@ -41,6 +41,7 @@ pub trait Trackable {
     fn deadline_date(&self) -> NaiveDate;
     fn is_hard(&self) -> bool;
     fn display(&self);
+    fn display_with_bullet(&self, show_bullet: bool);
     fn days_left(&self) -> i64;
     fn change_deadline(&mut self, new_date: NaiveDate);
     fn next_deadline(&self) -> (); // placeholder until we have multiple deadlines per item
@@ -60,6 +61,10 @@ impl Trackable for Item {
     }
 
     fn display(&self) {
+        self.display_with_bullet(true);
+    }
+
+    fn display_with_bullet(&self, show_bullet: bool) {
         let url_display = match &self.url {
             Some(u) => {
                 // OSC 8 hyperlink with bold text: \x1b[1m = bold, \x1b[0m = reset
@@ -67,8 +72,10 @@ impl Trackable for Item {
             }
             None => String::new(),
         };
+        let bullet = if show_bullet { "※ " } else { "" };
         println!(
-            "{} - due in {} days on {}{}",
+            "{}{} - due in {} days on {}{}",
+            bullet,
             self.name,
             self.days_left(),
             self.deadlines.date.format("%-d %b %Y"),
