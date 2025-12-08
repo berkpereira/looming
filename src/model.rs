@@ -40,6 +40,7 @@ pub trait Trackable {
     fn name(&self) -> &str;
     fn deadline_date(&self) -> NaiveDate;
     fn is_hard(&self) -> bool;
+    fn note(&self) -> Option<&str>;
     fn display(&self);
     fn display_with_bullet(&self, show_bullet: bool);
     fn days_left(&self) -> i64;
@@ -60,6 +61,10 @@ impl Trackable for Item {
         self.deadlines.hard
     }
 
+    fn note(&self) -> Option<&str> {
+        self.deadlines.note.as_deref()
+    }
+
     fn display(&self) {
         self.display_with_bullet(true);
     }
@@ -74,19 +79,19 @@ impl Trackable for Item {
         };
 
         let days_left = self.days_left();
-        // Color based on urgency: red (<=3), yellow (<=7), green (>7)
+        // Color based on urgency: red (<=3), orange (4-14), green (>14)
         let days_color = if days_left <= 3 {
             "\x1b[1;31m" // bold red
-        } else if days_left <= 7 {
-            "\x1b[1;33m" // bold yellow
+        } else if days_left <= 14 {
+            "\x1b[1;33m" // bold orange (yellow)
         } else {
             "\x1b[1;32m" // bold green
         };
 
         let bullet = if show_bullet {
-            "\x1b[35m※\x1b[0m " // magenta bullet
+            format!("{}※\x1b[0m ", days_color) // bullet matches urgency color
         } else {
-            ""
+            String::new()
         };
 
         println!(

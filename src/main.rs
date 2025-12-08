@@ -49,6 +49,9 @@ fn handle_display(name: String) -> anyhow::Result<()> {
     for item in items {
         if item.name() == name {
             item.display_with_bullet(false);
+            if let Some(note) = item.note() {
+                println!("  Note: {}", note);
+            }
             return Ok(());
         }
     }
@@ -80,8 +83,12 @@ fn handle_extend(name: String, days: i64) -> anyhow::Result<()> {
 }
 
 fn handle_list() -> anyhow::Result<()> {
-    let items = storage::load()?;
+    let mut items = storage::load()?;
     let mut printed: usize = 0;
+
+    // Sort by deadline (nearest first)
+    items.sort_by_key(|item| item.deadline_date());
+
     for item in items {
         item.display();
         printed += 1;
@@ -99,8 +106,12 @@ fn handle_remove(name: String) -> anyhow::Result<()> {
 }
 
 fn handle_in(days: i64) -> anyhow::Result<()> {
-    let items = storage::load()?;
+    let mut items = storage::load()?;
     let mut printed: usize = 0;
+
+    // Sort by deadline (nearest first)
+    items.sort_by_key(|item| item.deadline_date());
+
     for item in items {
         if item.days_left() <= days {
             item.display();
