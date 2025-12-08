@@ -71,7 +71,7 @@ fn handle_extend(name: String, days: i64) -> anyhow::Result<()> {
                     "Extended deadline for '{}' by {} days to {}.",
                     name,
                     days,
-                    item.deadline_date().format("%d-%m-%Y")
+                    item.deadline_date().format("%-d %b %Y")
                 );
             }
         }
@@ -102,14 +102,8 @@ fn handle_in(days: i64) -> anyhow::Result<()> {
     let items = storage::load()?;
     let mut printed: usize = 0;
     for item in items {
-        let days_left = item.days_left();
-        if days_left <= days {
-            println!(
-                "{} - due in {} days on {}",
-                item.name(),
-                days_left,
-                item.deadline_date().format("%d-%m-%Y")
-            );
+        if item.days_left() <= days {
+            item.display();
             printed += 1;
         }
     }

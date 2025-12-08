@@ -71,7 +71,7 @@ impl Trackable for Item {
             "{} - due in {} days on {}{}",
             self.name,
             self.days_left(),
-            self.deadlines.date.format("%d-%m-%Y"),
+            self.deadlines.date.format("%-d %b %Y"),
             url_display
         );
     }
