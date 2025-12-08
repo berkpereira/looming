@@ -67,18 +67,35 @@ impl Trackable for Item {
     fn display_with_bullet(&self, show_bullet: bool) {
         let url_display = match &self.url {
             Some(u) => {
-                // OSC 8 hyperlink with bold text: \x1b[1m = bold, \x1b[0m = reset
-                format!(" (\x1b[1m\x1b]8;;{}\x1b\\{}\x1b]8;;\x1b\\\x1b[0m)", u, u)
+                // OSC 8 hyperlink with bold cyan text
+                format!(" (\x1b[1;36m\x1b]8;;{}\x1b\\{}\x1b]8;;\x1b\\\x1b[0m)", u, u)
             }
             None => String::new(),
         };
-        let bullet = if show_bullet { "※ " } else { "" };
+
+        let days_left = self.days_left();
+        // Color based on urgency: red (<=3), yellow (<=7), green (>7)
+        let days_color = if days_left <= 3 {
+            "\x1b[1;31m" // bold red
+        } else if days_left <= 7 {
+            "\x1b[1;33m" // bold yellow
+        } else {
+            "\x1b[1;32m" // bold green
+        };
+
+        let bullet = if show_bullet {
+            "\x1b[35m※\x1b[0m " // magenta bullet
+        } else {
+            ""
+        };
+
         println!(
-            "{}{} - due in {} days on {}{}",
+            "{}\x1b[1m{}\x1b[0m - due in {}{} days\x1b[0m on \x1b[36m{}\x1b[0m{}",
             bullet,
-            self.name,
-            self.days_left(),
-            self.deadlines.date.format("%-d %b %Y"),
+            self.name,           // bold name
+            days_color,
+            days_left,
+            self.deadlines.date.format("%-d %b %Y"),  // cyan date
             url_display
         );
     }

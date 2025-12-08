@@ -12,7 +12,7 @@ pub struct Cli {
     pub command: Option<Commands>,
 }
 
-// TODO add a command
+// TODO add a command to modify item
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Add a new deadline
