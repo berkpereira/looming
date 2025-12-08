@@ -1,0 +1,6 @@
+[[items]]
+name = "conference"
+
+[items.deadlines]
+date = "2025-12-31"
+hard = true
