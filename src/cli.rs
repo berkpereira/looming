@@ -1,19 +1,18 @@
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
-use looming::model::Trackable;
-use looming::{model, storage};
 
 fn parse_date(s: &str) -> Result<NaiveDate, chrono::ParseError> {
-    NaiveDate::parse_from_str(s, "%Y-%m-%d")
+    NaiveDate::parse_from_str(s, "%d-%m-%Y")
 }
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
 pub struct Cli {
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
+// TODO add a command
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Add a new deadline
@@ -22,11 +21,11 @@ pub enum Commands {
         #[arg(short, long)]
         name: String,
 
-        /// Deadline type (hard or soft)
+        /// Deadline type
         #[arg(short = 't', long, value_parser = ["hard", "soft"], default_value_t = String::from("hard"))]
-        item_type: String,
+        r#type: String,
 
-        /// Deadline YYYY-MM-DD
+        /// Deadline DD-MM-YYYY
         #[arg(short, long, value_parser = parse_date)]
         deadline: NaiveDate,
 
@@ -42,10 +41,33 @@ pub enum Commands {
     /// List all tracked items
     List,
 
-    /// Show items due soon
-    Upcoming {
-        /// Number of days to look ahead
-        #[arg(short, long, default_value_t = 14)]
+    /// Display an item by name
+    Display {
+        /// Name of the item to display
+        name: String,
+    },
+
+    /// Remove an item by name
+    Remove {
+        /// Name of the item to remove
+        name: String,
+    },
+
+    /// Extend a soft deadline by N days
+    Extend {
+        /// Name of the soft item to extend
+        #[arg(short, long)]
+        name: String,
+
+        /// Number of days to extend by
+        #[arg(short, long, default_value_t = 7)]
+        days: i64,
+    },
+
+    /// Show items due in the next N days
+    In {
+        /// Number of days to look ahead (default: 14)
+        #[arg(default_value_t = 14)]
         days: i64,
     },
 }
